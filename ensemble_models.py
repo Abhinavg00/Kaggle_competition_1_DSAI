@@ -59,11 +59,10 @@ X_train, X_val, y_train, y_val = train_test_split(
 print(f"Training set: {X_train.shape}, Validation set: {X_val.shape}")
 
 
-# using k-fold cross-validation within Optuna to ensure robust hyperparameter tuning.
+# using k-fold cross-validation
 imputer = KNNImputer(n_neighbors=5)
-# Fit ONLY on the training data
+# Fit on the training data only
 X_train = pd.DataFrame(imputer.fit_transform(X_train), columns=feature_names)
-# Transform the validation data using the fitted imputer
 X_val = pd.DataFrame(imputer.transform(X_val), columns=feature_names)
 
 
@@ -288,3 +287,4 @@ submission_df.to_csv('submission.csv', index=False)
 # to maximize AUC, rather than just having 0 or 1 predictions, we output the probabilities directly.
 
 print("Process completed and file created for submission.")
+
