@@ -8,8 +8,6 @@ import xgboost as xgb
 import lightgbm as lgb
 from catboost import CatBoostClassifier
 import optuna
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 train_df = pd.read_csv('train.csv')
 
@@ -214,11 +212,10 @@ all_scores = {**final_scores, 'Ensemble': ensemble_auc}
 best_model_name = max(all_scores, key=all_scores.get)
 print(f"\nBest performing model: {best_model_name} (AUC: {all_scores[best_model_name]:.6f})")
 
-# Use the original full dataset for final training
+# Using full dataset for final training
 X_full_train_imputed = pd.DataFrame(imputer.fit_transform(X), columns=feature_names)
 X_full_train_scaled = pd.DataFrame(scaler.fit_transform(X_full_train_imputed), columns=feature_names)
 
-# This will hold the model(s) trained on the full dataset
 final_model = None
 
 if best_model_name != 'Ensemble':
@@ -233,7 +230,6 @@ if best_model_name != 'Ensemble':
     elif best_model_name == 'LightGBM':
         final_model = lgb.LGBMClassifier(**best_params, objective='binary', metric='auc', random_state=42, n_jobs=-1)
             
-    # Fit the newly created model on the full data. This will now work correctly.
     final_model.fit(X_full_train_scaled, y)
 
 else:
@@ -248,9 +244,7 @@ else:
         elif name == 'LightGBM':
             model_for_retraining = lgb.LGBMClassifier(**best_params, objective='binary', metric='auc', random_state=42, n_jobs=-1)
         
-        # Fit the new model instance
         model_for_retraining.fit(X_full_train_scaled, y)
-        # Update the dictionary with the fully retrained model
         final_models[name] = model_for_retraining
 
 try:
@@ -293,4 +287,4 @@ submission_df.to_csv('submission.csv', index=False)
 
 # to maximize AUC, rather than just having 0 or 1 predictions, we output the probabilities directly.
 
-print("Submission file 'submission.csv' created successfully.")
+print("Process completed and file created for submission.")
